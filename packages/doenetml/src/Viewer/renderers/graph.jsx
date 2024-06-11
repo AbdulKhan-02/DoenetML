@@ -3,8 +3,8 @@ import { sizeToCSS } from "./utils/css";
 import useDoenetRenderer from "../useDoenetRenderer";
 import me from "math-expressions";
 import VisibilitySensor from "react-visibility-sensor-v2";
-import JXG from "./jsxgraph-distrib/jsxgraphcore.mjs";
-// import JXG from './jsxgraph';
+// import JXG from "./jsxgraph-distrib/jsxgraphcore.mjs";
+import JXG from 'jsxgraph';
 import { cesc } from "@doenet/utils";
 
 export const BoardContext = createContext();
@@ -753,104 +753,104 @@ export default React.memo(function Graph(props) {
         // otherwise have 4 minor ticks
         // (Other changes are simply to account for fact that
         // don't have access to Mat and Type)
-        xaxis.current.defaultTicks.generateEquidistantTicks = function (
-            coordsZero,
-            bounds,
-        ) {
-            // First change from JSXgraph: increase minTickDistance for larger numbers
-            this.minTicksDistance =
-                2 *
-                Math.max(
-                    2.5,
-                    Math.log10(Math.abs(bounds.lower)),
-                    Math.log10(Math.abs(bounds.upper)),
-                );
+        // xaxis.current.defaultTicks.generateEquidistantTicks = function (
+        //     coordsZero,
+        //     bounds,
+        // ) {
+        //     // First change from JSXgraph: increase minTickDistance for larger numbers
+        //     this.minTicksDistance =
+        //         2 *
+        //         Math.max(
+        //             2.5,
+        //             Math.log10(Math.abs(bounds.lower)),
+        //             Math.log10(Math.abs(bounds.upper)),
+        //         );
 
-            var tickPosition,
-                eps2 = 1e-6,
-                deltas,
-                // Distance between two major ticks in user coordinates
-                ticksDelta = this.equidistant
-                    ? this.ticksFunction(1)
-                    : this.ticksDelta,
-                ev_it = true,
-                ev_mt = 4;
-            this.visProp.minorticks = 4;
+        //     var tickPosition,
+        //         eps2 = 1e-6,
+        //         deltas,
+        //         // Distance between two major ticks in user coordinates
+        //         ticksDelta = this.equidistant
+        //             ? this.ticksFunction(1)
+        //             : this.ticksDelta,
+        //         ev_it = true,
+        //         ev_mt = 4;
+        //     this.visProp.minorticks = 4;
 
-            // Calculate X and Y distance between two major ticks
-            deltas = this.getXandYdeltas();
+        //     // Calculate X and Y distance between two major ticks
+        //     deltas = this.getXandYdeltas();
 
-            // adjust ticks distance
-            ticksDelta *= this.visProp.scale;
-            if (ev_it && this.minTicksDistance > 1e-6) {
-                ticksDelta = this.adjustTickDistance(
-                    ticksDelta,
-                    coordsZero,
-                    deltas,
-                );
+        //     // adjust ticks distance
+        //     ticksDelta *= this.visProp.scale;
+        //     if (ev_it && this.minTicksDistance > 1e-6) {
+        //         ticksDelta = this.adjustTickDistance(
+        //             ticksDelta,
+        //             coordsZero,
+        //             deltas,
+        //         );
 
-                // Second change from JSXgraph function:
-                // check if ticksDelta is 2*10^n for some integer n
-                let mag =
-                    10 ** Math.floor(Math.log10(ticksDelta)) *
-                    this.visProp.scale;
-                if (Math.abs(ticksDelta / mag - 2) < 1e-14) {
-                    ev_mt = 3;
-                    this.visProp.minorticks = 3;
-                }
-                ticksDelta /= ev_mt + 1;
-            } else if (!ev_it) {
-                ticksDelta /= ev_mt + 1;
-            }
-            this.ticksDelta = ticksDelta;
+        //         // Second change from JSXgraph function:
+        //         // check if ticksDelta is 2*10^n for some integer n
+        //         let mag =
+        //             10 ** Math.floor(Math.log10(ticksDelta)) *
+        //             this.visProp.scale;
+        //         if (Math.abs(ticksDelta / mag - 2) < 1e-14) {
+        //             ev_mt = 3;
+        //             this.visProp.minorticks = 3;
+        //         }
+        //         ticksDelta /= ev_mt + 1;
+        //     } else if (!ev_it) {
+        //         ticksDelta /= ev_mt + 1;
+        //     }
+        //     this.ticksDelta = ticksDelta;
 
-            if (ticksDelta < 1e-6) {
-                return;
-            }
+        //     if (ticksDelta < 1e-6) {
+        //         return;
+        //     }
 
-            // Position ticks from zero to the positive side while not reaching the upper boundary
-            tickPosition = 0;
-            if (!this.visProp.drawzero) {
-                tickPosition = ticksDelta;
-            }
-            while (tickPosition <= bounds.upper + eps2) {
-                // Only draw ticks when we are within bounds, ignore case where tickPosition < lower < upper
-                if (tickPosition >= bounds.lower - eps2) {
-                    this.processTickPosition(
-                        coordsZero,
-                        tickPosition,
-                        ticksDelta,
-                        deltas,
-                    );
-                }
-                tickPosition += ticksDelta;
+        //     // Position ticks from zero to the positive side while not reaching the upper boundary
+        //     tickPosition = 0;
+        //     if (!this.visProp.drawzero) {
+        //         tickPosition = ticksDelta;
+        //     }
+        //     while (tickPosition <= bounds.upper + eps2) {
+        //         // Only draw ticks when we are within bounds, ignore case where tickPosition < lower < upper
+        //         if (tickPosition >= bounds.lower - eps2) {
+        //             this.processTickPosition(
+        //                 coordsZero,
+        //                 tickPosition,
+        //                 ticksDelta,
+        //                 deltas,
+        //             );
+        //         }
+        //         tickPosition += ticksDelta;
 
-                // Emergency out
-                if (bounds.upper - tickPosition > ticksDelta * 10000) {
-                    break;
-                }
-            }
+        //         // Emergency out
+        //         if (bounds.upper - tickPosition > ticksDelta * 10000) {
+        //             break;
+        //         }
+        //     }
 
-            // Position ticks from zero (not inclusive) to the negative side while not reaching the lower boundary
-            tickPosition = -ticksDelta;
-            while (tickPosition >= bounds.lower - eps2) {
-                // Only draw ticks when we are within bounds, ignore case where lower < upper < tickPosition
-                if (tickPosition <= bounds.upper + eps2) {
-                    this.processTickPosition(
-                        coordsZero,
-                        tickPosition,
-                        ticksDelta,
-                        deltas,
-                    );
-                }
-                tickPosition -= ticksDelta;
+        //     // Position ticks from zero (not inclusive) to the negative side while not reaching the lower boundary
+        //     tickPosition = -ticksDelta;
+        //     while (tickPosition >= bounds.lower - eps2) {
+        //         // Only draw ticks when we are within bounds, ignore case where lower < upper < tickPosition
+        //         if (tickPosition <= bounds.upper + eps2) {
+        //             this.processTickPosition(
+        //                 coordsZero,
+        //                 tickPosition,
+        //                 ticksDelta,
+        //                 deltas,
+        //             );
+        //         }
+        //         tickPosition -= ticksDelta;
 
-                // Emergency out
-                if (tickPosition - bounds.lower > ticksDelta * 10000) {
-                    break;
-                }
-            }
-        };
+        //         // Emergency out
+        //         if (tickPosition - bounds.lower > ticksDelta * 10000) {
+        //             break;
+        //         }
+        //     }
+        // };
 
         theBoard.unsuspendUpdate();
     }
