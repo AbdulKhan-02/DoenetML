@@ -15,8 +15,6 @@ const TextNoSelect = styled.text`
     user-select: none;
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 `;
-//TODO: display the points on the graph,after hardcoded points are completed. Try putting a point by clicking at the number line
-//TODO: Also have the xlabel show up
 
 // Used before ActionButton and ToggleButton were implemented:
 // const ModeButton = styled.button`
@@ -41,7 +39,6 @@ export default React.memo(function subsetOfReals(props) {
     let [mode, setMode] = useState("add remove points");
     let bounds = useRef(null);
     let pointGrabbed = useRef(null);
-    let board = useRef(null);
 
     let onChangeVisibility = (isVisible) => {
         callAction({
@@ -58,47 +55,6 @@ export default React.memo(function subsetOfReals(props) {
             });
         };
     }, []);
-    useEffect(() => {
-        if (board.current === null) {
-          board.current = JXG.JSXGraph.initBoard(id, {
-           
-            boundingbox: [SVs.xmin, 1, SVs.xmax, -1],
-            axis: false,
-            showNavigation:false,
-            grid:false,
-            zoom:false,
-            pan:false,
-          });
-          board.current.create('axis', [[0, 0], [1, 0]], {
-            ticks: {
-              drawLabels: true,
-              label: {
-                anchorX: 'middle',
-                anchorY: 'top',
-             },
-              majorHeight:10,
-              drawZero:true,
-              x : {
-              name: 'X',
-              withLabel: true,
-              label: {
-              position: 'rt',
-              offset: [-10, -15]
-        }},
-    },
-            
-});
-        //major height and minor height gives the height of the ticks. if the heights are -1 it means they are infinite
-        }
-        return () => {
-          board.current && JXG.JSXGraph.freeBoard(board.current);
-          board.current = null;
-        };
-      }, [id]);
-    
-      if (SVs.hidden) {
-        return null;
-      }
 
     if (SVs.hidden) {
         return null;
@@ -114,22 +70,11 @@ export default React.memo(function subsetOfReals(props) {
             setMode("move points");
         }
     }
-    console.log(SVs);
+
     let controlButtons = null;
     if (!SVs.fixed) {
         controlButtons = (
             <>
-                <button onClick = {()=>{
-                    callAction({
-                        action: actions.addPoint,
-                        args: { value: 1 },
-                    });
-                    callAction({
-                        action: actions.addPoint,
-                        args: { value: 2 }, 
-                        
-                    });
-                }}>ADD</button>
                 <ToggleButtonGroup onClick={handleTogglePoints}>
                     <ToggleButton value="Add/Remove points"></ToggleButton>
                     <ToggleButton value="Toggle points and intervals"></ToggleButton>
@@ -398,97 +343,63 @@ export default React.memo(function subsetOfReals(props) {
             }
         }
     }
-        const divStyle = {
-        width: sizeToCSS(SVs.width),
-        aspectRatio: String(SVs.aspectRatio),
-        maxWidth: "100%",
-    };
-
-    let outerStyle = {};
-
-    if (SVs.hidden) {
-        divStyle.display = "none";
-    } else if (SVs.displayMode === "inline") {
-        outerStyle = { display: "inline-block", verticalAlign: "middle" };
-    } else {
-        outerStyle = { display: "flex", justifyContent: SVs.horizontalAlign };
-    }
-
-    if (SVs.showBorder) {
-        divStyle.border = "2px solid var(--canvastext)";
-    } else {
-        divStyle.border = "none";
-    }
-    divStyle.marginBottom = "12px";
-    divStyle.marginTop = "12px";
-    divStyle.backgroundColor = "var(--canvas)";
-    divStyle.color = "var(--canvastext)";
-
+   
     return (
-        // <VisibilitySensor
-        //     partialVisibility={true}
-        //     onChange={onChangeVisibility}
-        // >
-        //     <>
-        //         <a name={id} />
-        //         <div ref={bounds} style={{ display: "flex", gap: "12px" }}>
-        //             {controlButtons}
-        //         </div>
-        //         <svg
-        //             width="808"
-        //             height="80"
-        //             style={{ backgroundColor: "white" }}
-        //             onMouseDown={(e) => {
-        //                 handleInput(e, "down");
-        //             }}
-        //             onMouseUp={(e) => {
-        //                 handleInput(e, "up");
-        //             }}
-        //             onMouseMove={(e) => {
-        //                 handleInput(e, "move");
-        //             }}
-        //             onMouseLeave={(e) => {
-        //                 handleInput(e, "leave");
-        //             }}
-        //         >
-        //             <polygon
-        //                 points="5,40 20,50 20,30"
-        //                 style={{
-        //                     fill: "black",
-        //                     stroke: "black",
-        //                     strokeWidth: "1",
-        //                 }}
-        //             />
-        //             <polygon
-        //                 points="795,40 780,50 780,30"
-        //                 style={{
-        //                     fill: "black",
-        //                     stroke: "black",
-        //                     strokeWidth: "1",
-        //                 }}
-        //             />
-        //             {storedLines}
-        //             {hashLines}
-        //             <line
-        //                 x1="20"
-        //                 y1="40"
-        //                 x2="780"
-        //                 y2="40"
-        //                 style={{ stroke: "black", strokeWidth: "2" }}
-        //             />
-        //             {storedPoints}
-        //             {labels}
-        //         </svg>
-        //     </>
-        // </VisibilitySensor>
-        <VisibilitySensor partialVisibility={true} onChange={onChangeVisibility}>
-        <>
-          <a name={id} />
-          <div ref={bounds} style={{ display: "flex", gap: "12px" }}>
-            {controlButtons}
-          </div>
-          <div id={id} style={{ width: "300px", height: "100px" }}></div>
-        </>
-      </VisibilitySensor>
+        <VisibilitySensor
+            partialVisibility={true}
+            onChange={onChangeVisibility}
+        >
+            <>
+                <a name={id} />
+                <div ref={bounds} style={{ display: "flex", gap: "12px" }}>
+                    {controlButtons}
+                </div>
+                <svg
+                    width="808"
+                    height="80"
+                    style={{ backgroundColor: "white" }}
+                    onMouseDown={(e) => {
+                        handleInput(e, "down");
+                    }}
+                    onMouseUp={(e) => {
+                        handleInput(e, "up");
+                    }}
+                    onMouseMove={(e) => {
+                        handleInput(e, "move");
+                    }}
+                    onMouseLeave={(e) => {
+                        handleInput(e, "leave");
+                    }}
+                >
+                    <polygon
+                        points="5,40 20,50 20,30"
+                        style={{
+                            fill: "black",
+                            stroke: "black",
+                            strokeWidth: "1",
+                        }}
+                    />
+                    <polygon
+                        points="795,40 780,50 780,30"
+                        style={{
+                            fill: "black",
+                            stroke: "black",
+                            strokeWidth: "1",
+                        }}
+                    />
+                    {storedLines}
+                    {hashLines}
+                    <line
+                        x1="20"
+                        y1="40"
+                        x2="780"
+                        y2="40"
+                        style={{ stroke: "black", strokeWidth: "2" }}
+                    />
+                    {storedPoints}
+                    {labels}
+                </svg>
+            </>
+        </VisibilitySensor>
     );
 });
